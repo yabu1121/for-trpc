@@ -90,16 +90,6 @@ export function WorkbenchSidebar({
           );
         })}
       </div>
-    
-      <div className="p-4 border-t border-[#F3F4F6] bg-[#F9FAFB]/50">
-        <div className="p-4 rounded-xl border border-dashed border-[#E5E7EB] flex flex-col items-center justify-center text-center gap-2">
-          <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-widest">Network Status</span>
-          <div className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
-            <span className="text-[10px] font-bold text-[#111827]">CONNECTED</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
