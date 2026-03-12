@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Zap, Search } from "lucide-react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { Zap, Search, GripVertical } from "lucide-react";
 import { api, vanillaApi } from "~/trpc/react";
 import { apiConfig } from "~/server/api-config";
 import type { TaskMap } from "./workbench/types";
@@ -62,6 +62,33 @@ export function TrpcWorkbench() {
   const [time, setTime] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [mutationBody, setMutationBody] = useState<string>("{\n  \n}");
+  
+  // Sidebar resize state
+  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = useCallback(() => setIsResizing(true), []);
+  const stopResizing = useCallback(() => setIsResizing(false), []);
+
+  const resize = useCallback(
+    (mouseMoveEvent: MouseEvent) => {
+      if (isResizing) {
+        // 200pxから600pxの間で調整可能にする
+        const newWidth = Math.min(Math.max(200, mouseMoveEvent.clientX - 20), 600);
+        setSidebarWidth(newWidth);
+      }
+    },
+    [isResizing]
+  );
+
+  useEffect(() => {
+    window.addEventListener("mousemove", resize);
+    window.addEventListener("mouseup", stopResizing);
+    return () => {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [resize, stopResizing]);
   
   const utils = api.useUtils();
   
@@ -154,7 +181,18 @@ export function TrpcWorkbench() {
         routers={routers}
         selectedRouter={selectedRouter}
         onRouterChange={setSelectedRouter}
+        width={sidebarWidth}
       />
+
+      {/* Resize handle */}
+      <div
+        className={`w-1 cursor-col-resize hover:bg-brand-cyan/30 transition-colors flex items-center justify-center relative group z-30 ${isResizing ? 'bg-brand-cyan/50' : 'bg-transparent'}`}
+        onMouseDown={startResizing}
+      >
+        <div className={`absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-black/5 rounded-full p-0.5 shadow-sm ${isResizing ? 'opacity-100' : ''}`}>
+           <GripVertical size={10} className="text-[#9CA3AF]" />
+        </div>
+      </div>
 
       <div className="flex-1 flex flex-col overflow-hidden bg-white/40">        
         <WorkbenchHeader 

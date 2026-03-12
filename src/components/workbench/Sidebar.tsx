@@ -19,6 +19,7 @@ interface SidebarProps {
   routers: string[];
   selectedRouter: string;
   onRouterChange: (router: string) => void;
+  width: number;
 }
 
 export function WorkbenchSidebar({
@@ -35,9 +36,13 @@ export function WorkbenchSidebar({
   routers,
   selectedRouter,
   onRouterChange,
+  width,
 }: SidebarProps) {
   return (
-    <div className="w-80 border-r border-[#F3F4F6] bg-gray-200/30 flex flex-col shrink-0 h-full overflow-hidden">
+    <div 
+      className="border-r border-[#F3F4F6] bg-gray-200/30 flex flex-col shrink-0 h-full overflow-hidden"
+      style={{ width: `${width}px` }}
+    >
       <div className="p-6 border-b border-[#F3F4F6] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-[10px] uppercase font-black tracking-[0.2em] text-[#111827]">Procedures</span>
