@@ -7,7 +7,6 @@ import { apiConfig } from "~/server/api-config";
 import type { TaskMap } from "./workbench/types";
 import { WorkbenchSidebar } from "./workbench/Sidebar";
 import { WorkbenchHeader } from "./workbench/Header";
-import { WorkbenchRequestPanel } from "./workbench/RequestPanel";
 import { WorkbenchResponsePanel } from "./workbench/ResponsePanel";
 
 const useTasks = () => {
@@ -93,7 +92,24 @@ export function TrpcWorkbench() {
       const result = await task.run(utils, inputData);
       setRes(result);
     } catch (e: any) {
-      setRes({ error: e.message });
+      // tRPC / Zod のエラーをパースして見やすくする
+      let errorMessage = e.message;
+      
+      // Zodのエラーメッセージが含まれている場合 (JSON形式で入っていることがある)
+      try {
+        const parsed = JSON.parse(e.message);
+        if (Array.isArray(parsed)) {
+          errorMessage = parsed.map((err: any) => `${err.path.join('.')}: ${err.message}`).join(', ');
+        }
+      } catch {
+        // 通常の文字列エラー
+      }
+
+      setRes({ 
+        error: "ERROR", 
+        message: errorMessage,
+        raw: e
+      });
     } finally {
       setTime(Math.round(performance.now() - start));
       setLoading(false);
@@ -109,7 +125,7 @@ export function TrpcWorkbench() {
   };
 
   return (
-    <div className="h-full flex bg-white/50 backdrop-blur-xl border border-black/5 rounded-2xl overflow-hidden font-sans shadow-2xl shadow-black/5">
+    <div className="h-full flex bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl overflow-hidden font-sans shadow-2xl shadow-black/5">
       <WorkbenchSidebar 
         tasks={TASKS}
         activeTab={activeTab}
@@ -131,18 +147,14 @@ export function TrpcWorkbench() {
         onExecute={() => runTask(selected)}
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden bg-white/40">
-        <div className="h-1 bg-gradient-to-r from-brand-cyan via-brand-violet to-brand-fuchsia" />
-        
+      <div className="flex-1 flex flex-col overflow-hidden bg-white/40">        
         <WorkbenchHeader 
-          selectedTaskName={selected}
-          selectedTask={TASKS[selected]}
+          selectedTaskName={selected} 
+          res={res}
           time={time}
-          loading={loading}
-          onExecute={() => runTask(selected)}
         />
 
-        <div className="flex-1 flex flex-col overflow-hidden relative selection:bg-brand-cyan selection:text-white">
+        <div className="flex-1 flex flex-col overflow-hidden relative">
           <WorkbenchResponsePanel 
             res={res}
             loading={loading}

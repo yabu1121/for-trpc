@@ -14,6 +14,12 @@ export const exampleRouter = createTRPCRouter({
       text: z.string(),
     }))  
     .query(({ input }) => {
+      if (!input.text) {
+        return{
+          error: "text is required",
+        }
+      }
+
       return {
         greeting: `hello ${ input.text }`,
       };

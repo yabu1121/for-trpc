@@ -7,6 +7,8 @@ export interface Task {
   icon: ReactNode;
   color: string;
   description: string;
+  status?: string;
+  required?: string[];
   run: (utils: any, data?: any) => Promise<any>;
 }
 

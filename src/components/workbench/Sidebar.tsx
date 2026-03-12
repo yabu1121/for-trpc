@@ -30,7 +30,7 @@ export function WorkbenchSidebar({
   onExecute,
 }: SidebarProps) {
   return (
-    <div className="w-80 border-r border-[#F3F4F6] bg-white/80 flex flex-col shrink-0">
+    <div className="w-80 border-r border-[#F3F4F6] bg-gray-200/30 flex flex-col shrink-0">
       <div className="p-6 border-b border-[#F3F4F6] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-[10px] uppercase font-black tracking-[0.2em] text-[#111827]">Procedures</span>

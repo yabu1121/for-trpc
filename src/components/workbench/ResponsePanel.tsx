@@ -42,21 +42,6 @@ export function WorkbenchResponsePanel({
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto w-full"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="p-6 rounded-2xl bg-white border border-black/5 shadow-xl shadow-black/5 flex flex-col gap-1">
-                <span className="text-[9px] font-black text-[#9CA3AF] uppercase tracking-widest">Data Structure</span>
-                <span className="text-lg font-bold text-[#111827]">{Array.isArray(res) ? "Collection" : typeof res === 'object' ? "Object" : "Scalar"}</span>
-              </div>
-              <div className="p-6 rounded-2xl bg-white border border-black/5 shadow-xl shadow-black/5 flex flex-col gap-1">
-                <span className="text-[9px] font-black text-[#9CA3AF] uppercase tracking-widest">Record Count</span>
-                <span className="text-lg font-bold text-[#111827]">{Array.isArray(res) ? res.length : 1}</span>
-              </div>
-              <div className="p-6 rounded-2xl bg-white border border-black/5 shadow-xl shadow-black/5 flex flex-col gap-1">
-                <span className="text-[9px] font-black text-[#9CA3AF] uppercase tracking-widest">Latency</span>
-                <span className="text-lg font-bold text-brand-cyan">{time}ms</span>
-              </div>
-            </div>
-
             <div className="flex items-center justify-between mb-6">
                <div className="flex items-center gap-3">
                  <div className="h-6 w-1 rounded-full bg-brand-cyan" />
