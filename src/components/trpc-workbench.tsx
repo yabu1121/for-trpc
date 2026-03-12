@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Zap, Search } from "lucide-react";
-import { api } from "~/trpc/react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { Zap, Search, GripVertical } from "lucide-react";
+import { api, vanillaApi } from "~/trpc/react";
 import { apiConfig } from "~/server/api-config";
 import type { TaskMap } from "./workbench/types";
 import { WorkbenchSidebar } from "./workbench/Sidebar";
@@ -10,8 +10,6 @@ import { WorkbenchHeader } from "./workbench/Header";
 import { WorkbenchResponsePanel } from "./workbench/ResponsePanel";
 
 const useTasks = () => {
-  const utils = api.useUtils();
-  
   return useMemo((): TaskMap => {
     return Object.fromEntries(
       apiConfig.map((item) => {
@@ -29,33 +27,34 @@ const useTasks = () => {
             icon: item.type === "mutation" ? <Zap size={14} /> : <Search size={14} />,
             color: item.type === "mutation" ? "text-yellow-500" : "text-brand-cyan",
             description: `Execute ${item.chain} ${item.type}`,
-            run: async (u: any, data: any) => {
+            run: async (_utils: any, data: any) => {
               const chainParts = item.chain.split(".");
-              let target = u;
+              
+              // vanillaApi (Proxy) を使って動的に関数を辿る
+              let target = vanillaApi as any;
               for (const p of chainParts) {
                 target = target?.[p];
               }
-              
-              if (!target) throw new Error(`Procedure ${item.chain} not found`);
 
               if (item.type === "query") {
-                return target.fetch(data);
+                if (!target?.query) throw new Error(`Query ${item.chain} not found`);
+                return target.query(data);
               } else {
-                const mutateFn = target.mutateAsync || target.mutate;
-                if (!mutateFn) throw new Error(`${item.chain} has no mutate method`);
-                return mutateFn(data);
+                if (!target?.mutate) throw new Error(`Mutation ${item.chain} not found`);
+                return target.mutate(data);
               }
             }
           }
         ];
       })
     );
-  }, [utils]);
+  }, []);
 };
 
 export function TrpcWorkbench() {
   const TASKS = useTasks();
   const [activeTab, setActiveTab] = useState<"query" | "mutation">("query");
+  const [selectedRouter, setSelectedRouter] = useState<string>("ALL");
   const [selected, setSelected] = useState<string>(Object.keys(TASKS)[0] ?? "");
   const [res, setRes] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -64,7 +63,39 @@ export function TrpcWorkbench() {
   const [copied, setCopied] = useState(false);
   const [mutationBody, setMutationBody] = useState<string>("{\n  \n}");
   
+  // Sidebar resize state
+  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = useCallback(() => setIsResizing(true), []);
+  const stopResizing = useCallback(() => setIsResizing(false), []);
+
+  const resize = useCallback(
+    (mouseMoveEvent: MouseEvent) => {
+      if (isResizing) {
+        // 200pxから600pxの間で調整可能にする
+        const newWidth = Math.min(Math.max(200, mouseMoveEvent.clientX - 20), 600);
+        setSidebarWidth(newWidth);
+      }
+    },
+    [isResizing]
+  );
+
+  useEffect(() => {
+    window.addEventListener("mousemove", resize);
+    window.addEventListener("mouseup", stopResizing);
+    return () => {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [resize, stopResizing]);
+  
   const utils = api.useUtils();
+  
+  const routers = useMemo(() => {
+    const r = apiConfig.map(item => item.chain.split(".")[0]).filter(Boolean);
+    return Array.from(new Set(r)) as string[];
+  }, []);
 
   const runTask = async (taskName: string) => {
     if (loading) return;
@@ -132,7 +163,7 @@ export function TrpcWorkbench() {
   };
 
   return (
-    <div className="h-full flex bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl overflow-hidden font-sans shadow-2xl shadow-black/5">
+    <div className="h-full max-h-[calc(100vh-120px)] flex bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl overflow-hidden font-sans shadow-2xl shadow-black/5 min-h-0">
       <WorkbenchSidebar 
         tasks={TASKS}
         activeTab={activeTab}
@@ -140,19 +171,28 @@ export function TrpcWorkbench() {
         selectedTask={selected}
         onSelectTask={(name) => {
           setSelected(name);
-          if (TASKS[name]?.type === "query") {
-            void runTask(name);
-          } else {
-            setRes(null);
-            setTime(null);
-          }
+          void runTask(name);
         }}
         loading={loading}
         taskLoading={taskLoading}
         requestBody={mutationBody}
         onRequestBodyChange={setMutationBody}
         onExecute={() => runTask(selected)}
+        routers={routers}
+        selectedRouter={selectedRouter}
+        onRouterChange={setSelectedRouter}
+        width={sidebarWidth}
       />
+
+      {/* Resize handle */}
+      <div
+        className={`w-1 cursor-col-resize hover:bg-brand-cyan/30 transition-colors flex items-center justify-center relative group z-30 ${isResizing ? 'bg-brand-cyan/50' : 'bg-transparent'}`}
+        onMouseDown={startResizing}
+      >
+        <div className={`absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-black/5 rounded-full p-0.5 shadow-sm ${isResizing ? 'opacity-100' : ''}`}>
+           <GripVertical size={10} className="text-[#9CA3AF]" />
+        </div>
+      </div>
 
       <div className="flex-1 flex flex-col overflow-hidden bg-white/40">        
         <WorkbenchHeader 
