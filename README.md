@@ -29,3 +29,5 @@ export const apiConfig: ApiEndpoint[] = [];
 の配列内にオブジェクトを入れ込んでいく。  
 type: queryかmutation  
 chain: apiを呼び出すときのメソッドチェーンを入れ込む  
+
+<img width="1922" height="2280" alt="image" src="https://github.com/user-attachments/assets/10e0ebd4-7ea4-461b-ba82-c88f894e0631" />
