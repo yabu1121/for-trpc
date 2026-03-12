@@ -1,0 +1,70 @@
+.
+├── README.md
+├── components
+├── db
+├── db.sqlite
+├── drizzle.config.ts
+├── lib
+├── memo.txt
+├── next-env.d.ts
+├── next.config.js
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   └── favicon.ico
+├── server
+├── src
+│   ├── app
+│   │   ├── api
+│   │   │   └── trpc
+│   │   │       └── [trpc]
+│   │   │           └── route.ts
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── project
+│   │       └── [id]
+│   │           └── page.tsx
+│   ├── components
+│   │   ├── dashboard
+│   │   │   └── project-manager.tsx
+│   │   ├── project-detail
+│   │   │   ├── endpoint-details.tsx
+│   │   │   ├── endpoint-list.tsx
+│   │   │   └── project-details-view.tsx
+│   │   └── ui
+│   ├── env.js
+│   ├── server
+│   │   ├── api
+│   │   │   ├── root.ts
+│   │   │   ├── routers
+│   │   │   │   ├── endpoint.ts
+│   │   │   │   ├── project.ts
+│   │   │   │   └── user.ts
+│   │   │   └── trpc.ts
+│   │   ├── api-config.ts
+│   │   └── db
+│   │       ├── index.ts
+│   │       ├── schema
+│   │       │   ├── _relations.ts
+│   │       │   ├── _table.ts
+│   │       │   ├── endpoint.ts
+│   │       │   ├── parameter.ts
+│   │       │   ├── project.ts
+│   │       │   ├── response.ts
+│   │       │   ├── tag.ts
+│   │       │   └── user.ts
+│   │       └── schema.ts
+│   ├── styles
+│   │   └── globals.css
+│   └── trpc
+│       ├── query-client.ts
+│       ├── react.tsx
+│       └── server.ts
+├── trpc
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
+├── types
+└── util
+
+26 directories, 41 files
