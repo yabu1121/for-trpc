@@ -2,6 +2,7 @@
 
 import { Terminal, Activity, Play, Loader2 } from "lucide-react";
 import type { TaskMap } from "./types";
+import { WorkbenchRequestPanel } from "./RequestPanel";
 
 interface SidebarProps {
   tasks: TaskMap;
@@ -11,6 +12,9 @@ interface SidebarProps {
   onSelectTask: (name: string) => void;
   loading: boolean;
   taskLoading: string | null;
+  requestBody: string;
+  onRequestBodyChange: (body: string) => void;
+  onExecute: () => void;
 }
 
 export function WorkbenchSidebar({
@@ -21,6 +25,9 @@ export function WorkbenchSidebar({
   onSelectTask,
   loading,
   taskLoading,
+  requestBody,
+  onRequestBodyChange,
+  onExecute,
 }: SidebarProps) {
   return (
     <div className="w-80 border-r border-[#F3F4F6] bg-white/80 flex flex-col shrink-0">
@@ -29,6 +36,13 @@ export function WorkbenchSidebar({
           <span className="text-[10px] uppercase font-black tracking-[0.2em] text-[#111827]">Procedures</span>
         </div>
       </div>
+
+      <WorkbenchRequestPanel 
+        body={requestBody}
+        setBody={onRequestBodyChange}
+        onExecute={onExecute}
+        loading={loading}
+      />
       
       <div className="flex border-b border-[#F3F4F6] p-2 gap-2 bg-[#F9FAFB]/50">
         <button 

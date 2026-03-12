@@ -5,15 +5,10 @@ export interface ApiEndpoint {
   type: ApiType;
 }
 
+/**
+ * Configure your tRPC endpoints here.
+ * Example: { chain: "example.hello", type: "query" }
+ */
 export const apiConfig: ApiEndpoint[] = [
-  // MUTATIONS
-  { chain: "testData.seed", type: "mutation" },
-  
-  // QUERIES
-  { chain: "testData.getCafes", type: "query" },
-  { chain: "user.getAll", type: "query" },
-  { chain: "project.getAll", type: "query" },
-  { chain: "endpoint.search", type: "query" },
-  { chain: "testData.getPosts", type: "query" },
-  { chain: "testData.getZipcodes", type: "query" },
+  { chain: "example.hello", type: "query" },
 ];

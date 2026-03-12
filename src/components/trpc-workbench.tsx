@@ -126,6 +126,9 @@ export function TrpcWorkbench() {
         }}
         loading={loading}
         taskLoading={taskLoading}
+        requestBody={mutationBody}
+        onRequestBodyChange={setMutationBody}
+        onExecute={() => runTask(selected)}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden bg-white/40">
@@ -140,15 +143,6 @@ export function TrpcWorkbench() {
         />
 
         <div className="flex-1 flex flex-col overflow-hidden relative selection:bg-brand-cyan selection:text-white">
-          {TASKS[selected]?.type === "mutation" && (
-            <WorkbenchRequestPanel 
-              body={mutationBody}
-              setBody={setMutationBody}
-              onExecute={() => runTask(selected)}
-              loading={loading}
-            />
-          )}
-
           <WorkbenchResponsePanel 
             res={res}
             loading={loading}
