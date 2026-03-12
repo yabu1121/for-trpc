@@ -54,6 +54,7 @@ const useTasks = () => {
 export function TrpcWorkbench() {
   const TASKS = useTasks();
   const [activeTab, setActiveTab] = useState<"query" | "mutation">("query");
+  const [selectedRouter, setSelectedRouter] = useState<string>("ALL");
   const [selected, setSelected] = useState<string>(Object.keys(TASKS)[0] ?? "");
   const [res, setRes] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -63,6 +64,11 @@ export function TrpcWorkbench() {
   const [mutationBody, setMutationBody] = useState<string>("{\n  \n}");
   
   const utils = api.useUtils();
+  
+  const routers = useMemo(() => {
+    const r = apiConfig.map(item => item.chain.split(".")[0]).filter(Boolean);
+    return Array.from(new Set(r)) as string[];
+  }, []);
 
   const runTask = async (taskName: string) => {
     if (loading) return;
@@ -130,7 +136,7 @@ export function TrpcWorkbench() {
   };
 
   return (
-    <div className="h-full flex bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl overflow-hidden font-sans shadow-2xl shadow-black/5">
+    <div className="h-full max-h-[calc(100vh-120px)] flex bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl overflow-hidden font-sans shadow-2xl shadow-black/5 min-h-0">
       <WorkbenchSidebar 
         tasks={TASKS}
         activeTab={activeTab}
@@ -145,6 +151,9 @@ export function TrpcWorkbench() {
         requestBody={mutationBody}
         onRequestBodyChange={setMutationBody}
         onExecute={() => runTask(selected)}
+        routers={routers}
+        selectedRouter={selectedRouter}
+        onRouterChange={setSelectedRouter}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden bg-white/40">        
