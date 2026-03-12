@@ -82,11 +82,11 @@ export function TrpcWorkbench() {
       if (!task) return;
 
       let inputData = undefined;
-      if (task.type === "mutation" && mutationBody.trim() !== "") {
+      if (mutationBody.trim() !== "" && mutationBody.trim() !== "{}") {
         try {
           inputData = JSON.parse(mutationBody);
         } catch (err) {
-          console.warn("Invalid JSON in mutation body", err);
+          console.warn("Invalid JSON in request body", err);
         }
       }
 

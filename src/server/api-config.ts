@@ -11,4 +11,5 @@ export interface ApiEndpoint {
  */
 export const apiConfig: ApiEndpoint[] = [
   { chain: "example.hello", type: "query" },
+  { chain: "example.inputHello", type: "query" }
 ];
