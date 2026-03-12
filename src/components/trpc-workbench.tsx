@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Zap, Search } from "lucide-react";
-import { api } from "~/trpc/react";
+import { api, vanillaApi } from "~/trpc/react";
 import { apiConfig } from "~/server/api-config";
 import type { TaskMap } from "./workbench/types";
 import { WorkbenchSidebar } from "./workbench/Sidebar";
@@ -10,8 +10,6 @@ import { WorkbenchHeader } from "./workbench/Header";
 import { WorkbenchResponsePanel } from "./workbench/ResponsePanel";
 
 const useTasks = () => {
-  const utils = api.useUtils();
-  
   return useMemo((): TaskMap => {
     return Object.fromEntries(
       apiConfig.map((item) => {
@@ -29,28 +27,28 @@ const useTasks = () => {
             icon: item.type === "mutation" ? <Zap size={14} /> : <Search size={14} />,
             color: item.type === "mutation" ? "text-yellow-500" : "text-brand-cyan",
             description: `Execute ${item.chain} ${item.type}`,
-            run: async (u: any, data: any) => {
+            run: async (_utils: any, data: any) => {
               const chainParts = item.chain.split(".");
-              let target = u;
+              
+              // vanillaApi (Proxy) を使って動的に関数を辿る
+              let target = vanillaApi as any;
               for (const p of chainParts) {
                 target = target?.[p];
               }
-              
-              if (!target) throw new Error(`Procedure ${item.chain} not found`);
 
               if (item.type === "query") {
-                return target.fetch(data);
+                if (!target?.query) throw new Error(`Query ${item.chain} not found`);
+                return target.query(data);
               } else {
-                const mutateFn = target.mutateAsync || target.mutate;
-                if (!mutateFn) throw new Error(`${item.chain} has no mutate method`);
-                return mutateFn(data);
+                if (!target?.mutate) throw new Error(`Mutation ${item.chain} not found`);
+                return target.mutate(data);
               }
             }
           }
         ];
       })
     );
-  }, [utils]);
+  }, []);
 };
 
 export function TrpcWorkbench() {
@@ -140,12 +138,7 @@ export function TrpcWorkbench() {
         selectedTask={selected}
         onSelectTask={(name) => {
           setSelected(name);
-          if (TASKS[name]?.type === "query") {
-            void runTask(name);
-          } else {
-            setRes(null);
-            setTime(null);
-          }
+          void runTask(name);
         }}
         loading={loading}
         taskLoading={taskLoading}

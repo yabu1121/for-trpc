@@ -1,7 +1,7 @@
 "use client";
 
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
-import { httpBatchStreamLink, loggerLink } from "@trpc/client";
+import { createTRPCClient, httpBatchStreamLink, loggerLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { useState } from "react";
@@ -20,7 +20,18 @@ const getQueryClient = () => {
   return clientQueryClientSingleton;
 };
 
+// React Hooks 用 (既存)
 export const api = createTRPCReact<AppRouter>();
+
+// Hooks を使わずに呼び出す用 (Workbenchなどで使用)
+export const vanillaApi = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchStreamLink({
+      transformer: SuperJSON,
+      url: getBaseUrl() + "/api/trpc",
+    }),
+  ],
+});
 
 export type RouterInputs = inferRouterInputs<AppRouter>;
 
