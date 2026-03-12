@@ -1,5 +1,8 @@
 # SWAGER LIKE TRPC CLIENT
 
+## 経緯
+GoやpythonのfastApi, jsのhonoなどにはrest clientのようなバックエンドだけでも動作を確認できるツールがあったにもかかわらず、tRPCにはそのようなツールがなかったため学習効率化やアプリケーション保守性の向上のため作成した。（厳密にはあったが長期間サポートされていなかったため、trpc version 11.0.0では動作しなかった。）
+
 ## 技術スタック
 - Next.js 15  
 - tRPC  
