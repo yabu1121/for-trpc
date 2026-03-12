@@ -93,22 +93,29 @@ export function TrpcWorkbench() {
       setRes(result);
     } catch (e: any) {
       // tRPC / Zod のエラーをパースして見やすくする
-      let errorMessage = e.message;
       
       // Zodのエラーメッセージが含まれている場合 (JSON形式で入っていることがある)
+      let displayMessage: string | string[] = e.message;
       try {
         const parsed = JSON.parse(e.message);
         if (Array.isArray(parsed)) {
-          errorMessage = parsed.map((err: any) => `${err.path.join('.')}: ${err.message}`).join(', ');
+          displayMessage = parsed.map((err: any) => `${err.path.join('.')}: ${err.message}`);
         }
       } catch {
-        // 通常の文字列エラー
+        // 文字列内に改行(\n)が含まれる場合、配列に分割してJSON上で複数行として表示させる
+        if (typeof e.message === 'string' && e.message.includes('\n')) {
+          displayMessage = e.message.split('\n').filter(Boolean);
+        }
       }
 
       setRes({ 
-        error: "ERROR", 
-        message: errorMessage,
-        raw: e
+        status: e.data?.code ?? "ERROR", 
+        message: displayMessage,
+        details: e.data ? {
+          path: e.data.path,
+          // スタックトレースを配列にして読みやすくし、最初の5行程度に絞る
+          stack: e.data.stack?.split('\n').slice(0, 5).filter(Boolean)
+        } : undefined
       });
     } finally {
       setTime(Math.round(performance.now() - start));
