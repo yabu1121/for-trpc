@@ -11,17 +11,22 @@ export const tasksRouter = createTRPCRouter({
     }))
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
-      const [task] = await db.insert(tasksTable).values({
-        name: input.name,
-        description: input.description,
-      }).returning();
+      const [task] = await db
+        .insert(tasksTable)
+        .values({
+          name: input.name,
+          description: input.description,
+        })
+        .returning();
       return task;
     }),
 
   getAllTasks: publicProcedure
     .query(async ({ ctx }) => {
       const { db } = ctx;
-      return await db.select().from(tasksTable);
+      return await db
+        .select()
+        .from(tasksTable);
     }),
 
   deleteTask: publicProcedure
@@ -30,13 +35,18 @@ export const tasksRouter = createTRPCRouter({
     }))
     .mutation( async ({ ctx, input }) => {
       const { db } = ctx;
-      const task = await db.query.tasksTable.findFirst({
-        where: eq(tasksTable.id, input.id),
-      });
+      const task = await db
+        .query
+        .tasksTable
+        .findFirst({
+          where: eq(tasksTable.id, input.id),
+        });
       if (!task) {
         throw new Error("Task not found");
       }
-      await db.delete(tasksTable).where(eq(tasksTable.id, input.id));
+      await db
+        .delete(tasksTable)
+        .where(eq(tasksTable.id, input.id));
       return task;
     }),
 
@@ -48,10 +58,14 @@ export const tasksRouter = createTRPCRouter({
     }))
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
-      const [task] = await db.update(tasksTable).set({
-        name: input.name,
-        description: input.description,
-      }).where(eq(tasksTable.id, input.id)).returning();
+      const [task] = await db
+        .update(tasksTable)
+        .set({
+          name: input.name,
+          description: input.description,
+        })
+        .where(eq(tasksTable.id, input.id))
+        .returning();
       return task;
     }),
 });
